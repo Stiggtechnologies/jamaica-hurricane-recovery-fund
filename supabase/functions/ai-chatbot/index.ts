@@ -12,6 +12,11 @@ interface ChatRequest {
   context?: any;
 }
 
+interface Message {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -78,6 +83,7 @@ async function handleChatMessage(
   let botResponse: string;
   let matchedKnowledgeId: string | null = null;
   let confidenceScore = bestScore;
+  let usedAi = false;
 
   if (bestMatch) {
     botResponse = bestMatch.answer;
@@ -91,7 +97,20 @@ async function handleChatMessage(
       })
       .eq('id', bestMatch.id);
   } else {
-    botResponse = await generateFallbackResponse(normalizedMessage);
+    const openAiKey = Deno.env.get('OPENAI_API_KEY');
+
+    if (openAiKey) {
+      try {
+        botResponse = await generateAiResponse(userMessage, sessionId, supabase);
+        usedAi = true;
+        confidenceScore = 0.9;
+      } catch (error) {
+        console.error('OpenAI API error:', error);
+        botResponse = await generateFallbackResponse(normalizedMessage);
+      }
+    } else {
+      botResponse = await generateFallbackResponse(normalizedMessage);
+    }
   }
 
   await supabase.from('chatbot_conversations').insert({
@@ -108,8 +127,76 @@ async function handleChatMessage(
     response: botResponse,
     confidence: confidenceScore,
     matched: bestMatch !== null,
+    ai_generated: usedAi,
     suggested_actions: getSuggestedActions(normalizedMessage),
   };
+}
+
+async function generateAiResponse(userMessage: string, sessionId: string, supabase: any): Promise<string> {
+  const openAiKey = Deno.env.get('OPENAI_API_KEY');
+
+  const { data: conversationHistory } = await supabase
+    .from('chatbot_conversations')
+    .select('user_message, bot_response')
+    .eq('session_id', sessionId)
+    .order('created_at', { ascending: true })
+    .limit(5);
+
+  const messages: Message[] = [
+    {
+      role: 'system',
+      content: `You are a helpful assistant for the Jamaica Hurricane Recovery Fund (JHRF). Your role is to:
+
+- Provide information about JHRF's mission to raise $100 million for hurricane relief and recovery in Jamaica
+- Explain how donations are used for immediate relief, long-term recovery, and climate-resilient rebuilding
+- Share information about volunteer opportunities and ways to get involved
+- Answer questions about hurricane recovery efforts in Jamaica
+- Direct people to donate at jamaicahurricanefund.org/donate
+- Be empathetic, professional, and encouraging
+- Keep responses concise and actionable
+
+Key information:
+- Founded by Orville Davis, a Jamaican-born entrepreneur based in Alberta, Canada
+- Partners include Stigg Security Inc., Omega Group, and Alberta Tech Team
+- Focus areas: rebuilding homes, schools, shelters, and community infrastructure
+- All donations support transparent, community-led recovery efforts
+- Contact: info@jamaicahurricanefund.org
+
+If you don't know something specific, direct them to contact info@jamaicahurricanefund.org or visit the website.`
+    }
+  ];
+
+  if (conversationHistory && conversationHistory.length > 0) {
+    for (const conv of conversationHistory) {
+      messages.push({ role: 'user', content: conv.user_message });
+      messages.push({ role: 'assistant', content: conv.bot_response });
+    }
+  }
+
+  messages.push({ role: 'user', content: userMessage });
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openAiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 500,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.text();
+    console.error('OpenAI API error:', errorData);
+    throw new Error('Failed to generate AI response');
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
 }
 
 function calculateMatchScore(message: string, knowledge: any): number {
@@ -129,10 +216,10 @@ function calculateMatchScore(message: string, knowledge: any): number {
 
   const messageWords = message.split(/\s+/);
   const questionWords = questionLower.split(/\s+/);
-  const commonWords = messageWords.filter(word => 
+  const commonWords = messageWords.filter(word =>
     word.length > 3 && questionWords.includes(word)
   ).length;
-  
+
   if (questionWords.length > 0) {
     score += (commonWords / questionWords.length) * 0.3;
   }
