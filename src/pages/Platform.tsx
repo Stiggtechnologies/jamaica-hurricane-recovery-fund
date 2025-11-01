@@ -25,6 +25,11 @@ export default function Platform() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateOrgModal, setShowCreateOrgModal] = useState(false);
+  const [newOrgName, setNewOrgName] = useState('');
+  const [newOrgType, setNewOrgType] = useState('nonprofit');
+  const [newOrgTier, setNewOrgTier] = useState('free');
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -55,6 +60,40 @@ export default function Platform() {
       currency: 'USD',
       minimumFractionDigits: 0,
     }).format(cents / 100);
+  };
+
+  const createOrganization = async () => {
+    if (!newOrgName.trim()) {
+      alert('Please enter an organization name');
+      return;
+    }
+
+    setCreating(true);
+    const slug = newOrgName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    const { error } = await supabase
+      .from('organizations')
+      .insert([
+        {
+          name: newOrgName,
+          slug: slug,
+          organization_type: newOrgType,
+          subscription_tier: newOrgTier,
+          is_active: true,
+        },
+      ]);
+
+    if (error) {
+      alert('Error creating organization: ' + error.message);
+    } else {
+      setShowCreateOrgModal(false);
+      setNewOrgName('');
+      setNewOrgType('nonprofit');
+      setNewOrgTier('free');
+      await fetchData();
+    }
+
+    setCreating(false);
   };
 
   const totalRaised = campaigns.reduce((sum, c) => sum + c.current_amount_cents, 0);
@@ -197,7 +236,10 @@ export default function Platform() {
                     Join the platform and create your relief program in minutes. No technical
                     expertise required.
                   </p>
-                  <button className="bg-white text-jamaican-green px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                  <button
+                    onClick={() => setShowCreateOrgModal(true)}
+                    className="bg-white text-jamaican-green px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                  >
                     <Plus className="w-5 h-5 inline-block mr-2" />
                     Create Organization
                   </button>
@@ -209,7 +251,10 @@ export default function Platform() {
               <div className="space-y-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">Organizations</h2>
-                  <button className="btn-primary">
+                  <button
+                    onClick={() => setShowCreateOrgModal(true)}
+                    className="btn-primary"
+                  >
                     <Plus className="w-5 h-5 inline-block mr-2" />
                     Add Organization
                   </button>
@@ -392,6 +437,87 @@ export default function Platform() {
               </div>
             )}
           </>
+        )}
+
+        {showCreateOrgModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Create New Organization</h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Organization Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newOrgName}
+                    onChange={(e) => setNewOrgName(e.target.value)}
+                    placeholder="Enter organization name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jamaican-green focus:border-transparent"
+                    disabled={creating}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Organization Type
+                  </label>
+                  <select
+                    value={newOrgType}
+                    onChange={(e) => setNewOrgType(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jamaican-green focus:border-transparent"
+                    disabled={creating}
+                  >
+                    <option value="nonprofit">Non-Profit</option>
+                    <option value="church">Church</option>
+                    <option value="school">School</option>
+                    <option value="corporate">Corporate</option>
+                    <option value="community">Community Group</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Subscription Tier
+                  </label>
+                  <select
+                    value={newOrgTier}
+                    onChange={(e) => setNewOrgTier(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jamaican-green focus:border-transparent"
+                    disabled={creating}
+                  >
+                    <option value="free">Free</option>
+                    <option value="basic">Basic - $29/month</option>
+                    <option value="pro">Pro - $99/month</option>
+                    <option value="enterprise">Enterprise - Custom</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex space-x-4 mt-8">
+                <button
+                  onClick={() => {
+                    setShowCreateOrgModal(false);
+                    setNewOrgName('');
+                    setNewOrgType('nonprofit');
+                    setNewOrgTier('free');
+                  }}
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                  disabled={creating}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={createOrganization}
+                  disabled={creating || !newOrgName.trim()}
+                  className="flex-1 px-6 py-3 bg-jamaican-green text-white rounded-lg font-semibold hover:bg-jamaican-green-dark transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                  {creating ? 'Creating...' : 'Create'}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
