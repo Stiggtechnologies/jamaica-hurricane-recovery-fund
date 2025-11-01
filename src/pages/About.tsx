@@ -31,7 +31,10 @@ export default function About() {
                   When the hurricane struck Jamaica, it wasn't just homes that were torn apart — it was the heart of a nation that gave so much to the world.
                 </p>
                 <p>
-                  For Orville Davis, founder of the Jamaica Hurricane Recovery Fund, this mission is deeply personal. Born and raised in Jamaica and now building businesses and communities in Alberta, Canada, Orville has never forgotten where his strength began.
+                  The Jamaica Hurricane Recovery Fund was founded by <strong>Orville Davis</strong>, a Jamaican-born entrepreneur who has built a successful career in Alberta, Canada. Born and raised in Jamaica and now building businesses and communities across North America, Orville has never forgotten where his strength began.
+                </p>
+                <p>
+                  Having witnessed the devastating impact of hurricanes on his homeland, Orville felt compelled to create a lasting solution that goes beyond immediate relief. With deep roots in Jamaica and a global perspective gained through his work in Canada, Orville envisioned a fund that would not only help communities recover but also build long-term resilience against future climate challenges.
                 </p>
                 <blockquote className="border-l-4 border-jamaican-gold pl-4 my-6 italic text-gray-800">
                   "Jamaica built my foundation — the strength, courage, and community that shaped who I am. Now, I'm using every skill, connection, and resource I have to help rebuild the foundations of others. I choose action over sympathy, and hope over heartbreak."
@@ -41,7 +44,7 @@ export default function About() {
                   This is more than a fundraiser. It's a movement of gratitude in action — uniting Jamaicans everywhere, the Caribbean diaspora, and allies around the world who believe that rebuilding homes also rebuilds lives.
                 </p>
                 <p>
-                  Through partnerships with trusted local organizations, businesses, and volunteers, the Fund is focused on immediate relief, long-term recovery, and climate-resilient rebuilding — ensuring that what we restore today will stand strong tomorrow.
+                  Through partnerships with Stigg Security Inc., Omega Group, the Alberta Tech Team, and trusted local organizations, the Fund is focused on immediate relief, long-term recovery, and climate-resilient rebuilding — ensuring that what we restore today will stand strong tomorrow.
                 </p>
                 <p className="font-semibold text-gray-900">
                   The Jamaica Hurricane Recovery Fund exists to turn compassion into construction, and concern into commitment — because real change begins when people choose to do more than feel. They choose to act.
