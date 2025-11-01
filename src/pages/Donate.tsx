@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { Heart, DollarSign, Calendar, Shield, CreditCard } from 'lucide-react';
+import { Heart, DollarSign, Calendar, Shield, CreditCard, AlertCircle } from 'lucide-react';
+import StripeCheckout from '../components/StripeCheckout';
 
 export default function Donate() {
   const [donationType, setDonationType] = useState<'one-time' | 'recurring'>('one-time');
   const [amount, setAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const [currency, setCurrency] = useState('USD');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const presetAmounts = [25, 50, 100, 250, 500, 1000];
 
@@ -17,6 +20,24 @@ export default function Donate() {
   const handleCustomAmount = (value: string) => {
     setCustomAmount(value);
     setAmount(null);
+    setError(null);
+  };
+
+  const getFinalAmount = (): number => {
+    if (customAmount) {
+      return parseFloat(customAmount);
+    }
+    return amount || 0;
+  };
+
+  const handlePaymentSuccess = () => {
+    setSuccess(true);
+    setError(null);
+  };
+
+  const handlePaymentError = (errorMessage: string) => {
+    setError(errorMessage);
+    setSuccess(false);
   };
 
   return (
@@ -141,29 +162,64 @@ export default function Donate() {
 
                 <div className="border-t pt-8">
                   <h3 className="text-xl font-heading font-bold mb-4">
-                    Choose Payment Method
+                    Complete Your Donation
                   </h3>
 
+                  {error && (
+                    <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
+                      <AlertCircle className="text-red-600 mr-3 flex-shrink-0 mt-0.5" size={20} />
+                      <p className="text-sm text-red-800">{error}</p>
+                    </div>
+                  )}
+
+                  {success && (
+                    <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-sm text-green-800 font-semibold">
+                        Thank you for your donation! You will receive a confirmation email shortly.
+                      </p>
+                    </div>
+                  )}
+
                   <div className="space-y-4">
-                    <div className="bg-gray-50 rounded-lg p-6 border-2 border-dashed border-gray-300">
+                    <div className="bg-white rounded-lg p-6 border-2 border-jamaican-green">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center">
                           <CreditCard className="text-jamaican-green mr-3" size={32} />
                           <div>
                             <div className="font-semibold text-lg">Credit/Debit Card</div>
-                            <div className="text-sm text-gray-600">Powered by Stripe</div>
+                            <div className="text-sm text-gray-600">Secure payment via Stripe</div>
                           </div>
                         </div>
-                        <Shield className="text-gray-400" size={24} />
+                        <Shield className="text-jamaican-green" size={24} />
                       </div>
-                      <div className="bg-white rounded p-4 text-center border border-gray-200">
-                        <p className="text-gray-600 text-sm mb-2">
-                          Secure payment processing via Stripe
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Integration ready - payment form will appear here
-                        </p>
+
+                      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-600">Donation Type:</span>
+                          <span className="font-semibold capitalize">{donationType}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-600">Amount:</span>
+                          <span className="font-semibold text-lg">
+                            {currency === 'USD' && '$'}
+                            {currency === 'CAD' && 'CA$'}
+                            {currency === 'GBP' && '£'}
+                            {getFinalAmount() || '0'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Currency:</span>
+                          <span className="font-semibold">{currency}</span>
+                        </div>
                       </div>
+
+                      <StripeCheckout
+                        amount={getFinalAmount()}
+                        currency={currency}
+                        donationType={donationType}
+                        onSuccess={handlePaymentSuccess}
+                        onError={handlePaymentError}
+                      />
                     </div>
 
                     <div className="bg-gray-50 rounded-lg p-6 border-2 border-dashed border-gray-300">
@@ -190,8 +246,7 @@ export default function Donate() {
 
                   <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <p className="text-sm text-blue-900">
-                      <strong>Note:</strong> Payment integrations are ready to be configured with your Stripe and Donorbox accounts.
-                      Once configured, donors will be able to complete secure transactions directly on this page.
+                      <strong>Secure Payment:</strong> All transactions are encrypted and secure. Your financial information is protected by industry-leading security standards.
                     </p>
                   </div>
                 </div>
