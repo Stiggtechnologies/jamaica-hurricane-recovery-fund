@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MapPin, Play, Users, Home, Building2, TrendingUp } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import SEOHead from '../components/SEOHead';
 
 interface Project {
   id: string;
@@ -95,6 +96,12 @@ export default function Impact() {
   };
 
   return (
+    <>
+      <SEOHead
+        title="Our Impact - Jamaica Hurricane Recovery Fund"
+        description="See how your donations are making a difference in Jamaica. Track our recovery projects, view impact stories, and see real-time progress on rebuilding homes, schools, and infrastructure."
+        url="https://jamaicahurricanerecoveryfund.org/impact"
+      />
     <div className="bg-white">
       <section
         className="relative h-[400px] bg-cover bg-center flex items-center"
@@ -324,5 +331,6 @@ export default function Impact() {
         </div>
       </section>
     </div>
+    </>
   );
 }

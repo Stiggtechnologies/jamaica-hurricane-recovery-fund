@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Heart, DollarSign, Calendar, Shield, CreditCard, AlertCircle } from 'lucide-react';
 import StripeCheckout from '../components/StripeCheckout';
+import SEOHead from '../components/SEOHead';
+import StructuredData from '../components/StructuredData';
 
 export default function Donate() {
   const [donationType, setDonationType] = useState<'one-time' | 'recurring'>('one-time');
@@ -41,6 +43,13 @@ export default function Donate() {
   };
 
   return (
+    <>
+      <SEOHead
+        title="Donate to Jamaica Hurricane Recovery Fund - Make an Impact"
+        description="Support hurricane relief in Jamaica. Your donation provides immediate relief, long-term recovery, and climate-resilient rebuilding. All donations are tax-deductible."
+        url="https://jamaicahurricanerecoveryfund.org/donate"
+      />
+      <StructuredData type="DonateAction" />
     <div className="bg-white">
       <section
         className="relative h-[400px] bg-cover bg-center flex items-center"
@@ -398,5 +407,6 @@ export default function Donate() {
         </div>
       </section>
     </div>
+    </>
   );
 }

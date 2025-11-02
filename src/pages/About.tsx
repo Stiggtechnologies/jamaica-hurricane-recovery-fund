@@ -1,7 +1,14 @@
 import { Target, Eye, Award, Shield } from 'lucide-react';
+import SEOHead from '../components/SEOHead';
 
 export default function About() {
   return (
+    <>
+      <SEOHead
+        title="About JHRF - Jamaica Hurricane Recovery Fund"
+        description="Learn about our mission to raise $100 million for hurricane relief in Jamaica. Founded by Orville Davis, we're building climate-resilient communities through transparent, community-led recovery efforts."
+        url="https://jamaicahurricanerecoveryfund.org/about"
+      />
     <div className="bg-white">
       <section
         className="relative h-[400px] bg-cover bg-center flex items-center"
@@ -221,5 +228,6 @@ export default function About() {
         </div>
       </section>
     </div>
+    </>
   );
 }

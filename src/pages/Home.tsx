@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Heart, Users, Home as HomeIcon, Building2, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import SEOHead from '../components/SEOHead';
+import StructuredData from '../components/StructuredData';
 
 interface DonationProgress {
   goal_amount: number;
@@ -46,6 +48,15 @@ export default function Home({ onNavigate }: HomeProps) {
   };
 
   return (
+    <>
+      <SEOHead
+        title="Jamaica Hurricane Recovery Fund - Rebuilding Stronger Together"
+        description="Join us in raising $100 million for hurricane relief and recovery in Jamaica. Support immediate relief, long-term recovery, and climate-resilient rebuilding."
+        url="https://jamaicahurricanerecoveryfund.org"
+      />
+      <StructuredData type="Organization" />
+      <StructuredData type="WebSite" />
+      <StructuredData type="DonateAction" />
     <div className="bg-white">
       <section
         className="relative h-[600px] bg-cover bg-center flex items-center"
@@ -233,5 +244,6 @@ export default function Home({ onNavigate }: HomeProps) {
         </div>
       </section>
     </div>
+    </>
   );
 }

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jamaicahurricanerecoveryfund.org/sitemap.xml
+Sitemap: https://your-project.supabase.co/functions/v1/sitemap
