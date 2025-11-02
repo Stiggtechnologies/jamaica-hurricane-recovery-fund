@@ -55,7 +55,7 @@ export default function Chatbot() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: userMessage.text,
+          message: userMessage.text,
           session_id: sessionId.current
         })
       });
