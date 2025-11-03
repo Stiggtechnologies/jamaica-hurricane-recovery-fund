@@ -17,6 +17,7 @@ export default function Header({ onNavigate, currentPage }: HeaderProps) {
     { name: 'Volunteer', id: 'volunteers' },
     { name: 'Platform', id: 'platform' },
     { name: 'News', id: 'news' },
+    { name: 'Blog', id: 'blog' },
     { name: 'Contact', id: 'contact' },
   ];
 

@@ -8,6 +8,7 @@ import Impact from './pages/Impact';
 import GetInvolved from './pages/GetInvolved';
 import Donate from './pages/Donate';
 import News from './pages/News';
+import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import Platform from './pages/Platform';
@@ -34,6 +35,8 @@ function App() {
         return <Platform />;
       case 'news':
         return <News />;
+      case 'blog':
+        return <Blog />;
       case 'contact':
         return <Contact />;
       case 'admin':
